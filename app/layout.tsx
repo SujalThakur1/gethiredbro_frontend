@@ -127,11 +127,6 @@ export const metadata: Metadata = {
     canonical: 'https://gethiredbro.com',
   },
 
-  // Verification
-  verification: {
-    google: 'googled8cd49dc3fbe9969',
-    yandex: '08c1b60c0ca7a67c',
-  },
 };
 
 export default function RootLayout({
@@ -142,8 +137,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <meta name="google-site-verification" content="imRCSgLPYAfjFfqcRAr536-QZlnidmMvZ5DwUZY9Uh0" />
         <meta name="msvalidate.01" content="43BB4B1D9B7F4EB7345434F4D1D2D757" />
-        
+        <meta name="yandex-verification" content="08c1b60c0ca7a67c" />
         {/* Structured Data (JSON-LD) - Very important for SEO */}
         <script
           type="application/ld+json"
