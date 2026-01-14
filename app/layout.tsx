@@ -1,4 +1,12 @@
 import type { Metadata } from "next";
+import {
+  ClerkProvider,
+  SignInButton,
+  SignUpButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from "@clerk/nextjs";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -135,75 +143,77 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <head>
-        <meta name="google-site-verification" content="imRCSgLPYAfjFfqcRAr536-QZlnidmMvZ5DwUZY9Uh0" />
-        <meta name="msvalidate.01" content="43BB4B1D9B7F4EB7345434F4D1D2D757" />
-        <meta name="yandex-verification" content="08c1b60c0ca7a67c" />
-        {/* Structured Data (JSON-LD) - Very important for SEO */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'WebApplication',
-              name: 'Get Hired Bro',
-              description:
-                'AI-powered platform that creates job-specific CVs and provides personalized interview preparation to help you land your next role faster and more effectively.',
-              url: 'https://gethiredbro.com',
-              applicationCategory: 'BusinessApplication',
-              operatingSystem: 'Web',
-              offers: {
-                '@type': 'Offer',
-                price: '0',
-                priceCurrency: 'USD',
-              },
-              aggregateRating: {
-                '@type': 'AggregateRating',
-                ratingValue: '5',
-                ratingCount: '1',
-              },
-              featureList: [
-                'AI CV Builder',
-                'Job-Specific Resume Creation',
-                'ATS-Optimized CVs',
-                'Interview Preparation',
-                'Personalized Career Guidance',
-              ],
-            }),
-          }}
-        />
-        
-        {/* Organization Schema */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'Organization',
-              name: 'Get Hired Bro',
-              url: 'https://gethiredbro.com',
-              logo: 'https://gethiredbro.com/images/Logo.png',
-              description:
-                'AI-powered platform that creates job-specific CVs and provides personalized interview preparation.',
-              sameAs: [
-                // Add your social media URLs here when you have them
-                // 'https://twitter.com/gethiredbro',
-                // 'https://linkedin.com/company/gethiredbro',
-              ],
-            }),
-          }}
-        />
-        
-        {/* Performance: Preconnect to external domains */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-      </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <head>
+          <meta name="google-site-verification" content="imRCSgLPYAfjFfqcRAr536-QZlnidmMvZ5DwUZY9Uh0" />
+          <meta name="msvalidate.01" content="43BB4B1D9B7F4EB7345434F4D1D2D757" />
+          <meta name="yandex-verification" content="08c1b60c0ca7a67c" />
+          {/* Structured Data (JSON-LD) - Very important for SEO */}
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                '@context': 'https://schema.org',
+                '@type': 'WebApplication',
+                name: 'Get Hired Bro',
+                description:
+                  'AI-powered platform that creates job-specific CVs and provides personalized interview preparation to help you land your next role faster and more effectively.',
+                url: 'https://gethiredbro.com',
+                applicationCategory: 'BusinessApplication',
+                operatingSystem: 'Web',
+                offers: {
+                  '@type': 'Offer',
+                  price: '0',
+                  priceCurrency: 'USD',
+                },
+                aggregateRating: {
+                  '@type': 'AggregateRating',
+                  ratingValue: '5',
+                  ratingCount: '1',
+                },
+                featureList: [
+                  'AI CV Builder',
+                  'Job-Specific Resume Creation',
+                  'ATS-Optimized CVs',
+                  'Interview Preparation',
+                  'Personalized Career Guidance',
+                ],
+              }),
+            }}
+          />
+          
+          {/* Organization Schema */}
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                '@context': 'https://schema.org',
+                '@type': 'Organization',
+                name: 'Get Hired Bro',
+                url: 'https://gethiredbro.com',
+                logo: 'https://gethiredbro.com/images/Logo.png',
+                description:
+                  'AI-powered platform that creates job-specific CVs and provides personalized interview preparation.',
+                sameAs: [
+                  // Add your social media URLs here when you have them
+                  // 'https://twitter.com/gethiredbro',
+                  // 'https://linkedin.com/company/gethiredbro',
+                ],
+              }),
+            }}
+          />
+          
+          {/* Performance: Preconnect to external domains */}
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        </head>
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        >
+          {children}
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
