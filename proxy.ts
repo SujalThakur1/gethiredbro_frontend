@@ -20,6 +20,7 @@ export default clerkMiddleware(
     // Automatically includes all necessary directives for Clerk and Turnstile
     // See: https://clerk.com/docs/guides/secure/best-practices/csp-headers
     contentSecurityPolicy: {
+      strict: true,
       // Add custom domain to directives (Clerk auto-detects FAPI URL, but custom domain needs explicit addition)
       directives: {
         'script-src': ['https://clerk.gethiredbro.com'],
