@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { useSignIn, useSignUp } from "@clerk/nextjs";
+import { useSignIn } from "@clerk/nextjs";
 import { isClerkAPIResponseError } from "@clerk/nextjs/errors";
 import { ClerkAPIError } from "@clerk/types";
 import ShareUI from "@/components/auth/shareui";
@@ -10,7 +10,6 @@ import ShareUI from "@/components/auth/shareui";
 export default function SignIn() {
   const router = useRouter();
   const { isLoaded, signIn, setActive } = useSignIn();
-  const { isLoaded: isSignUpLoaded, signUp } = useSignUp();
   const [isAnimating, setIsAnimating] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -86,17 +85,17 @@ export default function SignIn() {
   };
 
   const handleGoogleSignIn = async () => {
-    if (!isSignUpLoaded || !signUp) return;
+    if (!isLoaded || !signIn) return;
     
     setIsLoading(true);
     setError(null);
 
     try {
-      // Use signUp.authenticateWithRedirect which handles both sign-up and sign-in
-      // If user exists, it signs them in; if not, it creates account
-      await signUp.authenticateWithRedirect({
+      // Use signIn.authenticateWithRedirect - it will sign in existing users
+      // and can create new users if configured in Clerk dashboard
+      await signIn.authenticateWithRedirect({
         strategy: "oauth_google",
-        redirectUrl: "/home",
+        redirectUrl: "/sso-callback",
         redirectUrlComplete: "/home",
       });
     } catch (err) {
