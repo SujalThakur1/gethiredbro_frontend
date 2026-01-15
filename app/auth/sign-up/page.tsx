@@ -18,6 +18,8 @@ export default function SignUp() {
   const [success, setSuccess] = useState<string | null>(null);
   const [pendingVerification, setPendingVerification] = useState(false);
   const [code, setCode] = useState("");
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const [isAnimatingToVerification, setIsAnimatingToVerification] = useState(false);
   
   // Initialize based on sessionStorage to start off-screen if needed
   const [shouldAnimateIn, setShouldAnimateIn] = useState(() => {
@@ -38,6 +40,16 @@ export default function SignUp() {
       }, 50);
     }
   }, [shouldAnimateIn]);
+
+  // Countdown timer for resend cooldown
+  useEffect(() => {
+    if (resendCooldown > 0) {
+      const timer = setTimeout(() => {
+        setResendCooldown(resendCooldown - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendCooldown]);
 
   const handleSignInClick = () => {
     setIsAnimating(true);
@@ -69,9 +81,20 @@ export default function SignUp() {
       // Send the email verification code
       await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
 
-      // Show OTP input form
-      setPendingVerification(true);
-      setSuccess("Verification code sent to your email!");
+      // Start animation: animate sign-up form out to the right
+      setIsAnimatingToVerification(true);
+      
+      // After animation completes, change to verification form and animate content in
+      setTimeout(() => {
+        setPendingVerification(true);
+        setSuccess("Verification code sent to your email!");
+        setResendCooldown(30); // 30 second cooldown before allowing resend
+        
+        // Reset animation state after content animates in
+        setTimeout(() => {
+          setIsAnimatingToVerification(false);
+        }, 500);
+      }, 500); // Wait for sign-up form to animate out
     } catch (err: any) {
       const clerkError = err.errors?.[0] || err;
       const longMessage = clerkError.longMessage || "";
@@ -129,25 +152,66 @@ export default function SignUp() {
           ? "translate-x-full opacity-0 scale-95"
           : "translate-x-0 opacity-100 scale-100"
       }`}>
-        <div>
+        <div className={`transition-all duration-500 ease-in-out ${
+          isAnimating
+            ? "translate-x-full opacity-0 scale-95"
+            : shouldAnimateIn
+            ? "translate-x-full opacity-0 scale-95"
+            : isAnimatingToVerification && !pendingVerification
+            ? "translate-x-full opacity-0 scale-95"
+            : isAnimatingToVerification && pendingVerification
+            ? "translate-x-full opacity-0 scale-95"
+            : "translate-x-0 opacity-100 scale-100"
+        }`}>
           <h2 className="text-3xl font-bold text-white mb-2">Sign Up</h2>
           <p className="text-gray-300">Create your account to get started.</p>
         </div>
 
         {error && (
-          <div className="p-3 bg-red-500 bg-opacity-20 border border-red-500 rounded-lg text-red-200 text-sm">
+          <div className={`p-3 bg-red-500 bg-opacity-20 border border-red-500 rounded-lg text-red-200 text-sm transition-all duration-500 ease-in-out ${
+            isAnimating
+              ? "translate-x-full opacity-0 scale-95"
+              : shouldAnimateIn
+              ? "translate-x-full opacity-0 scale-95"
+              : isAnimatingToVerification && !pendingVerification
+              ? "translate-x-full opacity-0 scale-95"
+              : isAnimatingToVerification && pendingVerification
+              ? "translate-x-full opacity-0 scale-95"
+              : "translate-x-0 opacity-100 scale-100"
+          }`}>
             {error}
           </div>
         )}
         {success && (
-          <div className="p-3 bg-green-500 bg-opacity-20 border border-green-500 rounded-lg text-green-200 text-sm">
+          <div className={`p-3 bg-green-500 bg-opacity-20 border border-green-500 rounded-lg text-green-200 text-sm transition-all duration-500 ease-in-out ${
+            isAnimating
+              ? "translate-x-full opacity-0 scale-95"
+              : shouldAnimateIn
+              ? "translate-x-full opacity-0 scale-95"
+              : isAnimatingToVerification && !pendingVerification
+              ? "translate-x-full opacity-0 scale-95"
+              : isAnimatingToVerification && pendingVerification
+              ? "translate-x-full opacity-0 scale-95"
+              : "translate-x-0 opacity-100 scale-100"
+          }`}>
             {success}
           </div>
         )}
 
         {pendingVerification ? (
           // OTP Verification Form
-          <form onSubmit={handleVerifyEmail} className="space-y-4">
+          <form 
+            onSubmit={handleVerifyEmail} 
+            className={`space-y-4 transition-all duration-500 ease-in-out ${
+              isAnimating
+                ? "translate-x-full opacity-0 scale-95"
+                : shouldAnimateIn
+                ? "translate-x-full opacity-0 scale-95"
+                : isAnimatingToVerification
+                ? "translate-x-full opacity-0 scale-95"
+                : "translate-x-0 opacity-100 scale-100"
+            }`}
+          >
             <div>
               <h3 className="text-xl font-bold text-white mb-2">Verify Your Email</h3>
               <p className="text-gray-300 text-sm mb-4">
@@ -183,23 +247,55 @@ export default function SignUp() {
               <button
                 type="button"
                 onClick={async () => {
-                  if (!isLoaded || !signUp) return;
+                  if (!isLoaded || !signUp || resendCooldown > 0) return;
+                  
+                  setIsLoading(true);
+                  setError(null);
+                  
                   try {
                     await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
                     setSuccess("New verification code sent!");
+                    setResendCooldown(30); // 30 second cooldown
                   } catch (err: any) {
-                    setError(err.errors?.[0]?.message || "Failed to resend code");
+                    // Check for rate limit error (429)
+                    if (err.status === 429 || err.errors?.[0]?.code === "rate_limit_exceeded") {
+                      // Try to get Retry-After from headers or use default
+                      const retryAfter = err.headers?.['retry-after'] || err.retryAfter || 10;
+                      const waitTime = parseInt(retryAfter.toString());
+                      setError(`Too many requests. Please wait ${waitTime} seconds before trying again.`);
+                      setResendCooldown(waitTime);
+                    } else {
+                      const clerkError = err.errors?.[0] || err;
+                      const longMessage = clerkError.longMessage || "";
+                      const shortMessage = clerkError.shortMessage || "";
+                      const errorMessage = longMessage || shortMessage || "Failed to resend code";
+                      setError(errorMessage);
+                    }
+                  } finally {
+                    setIsLoading(false);
                   }
                 }}
-                className="text-blue-400 hover:text-blue-300 text-sm underline"
+                disabled={resendCooldown > 0 || isLoading}
+                className="text-blue-400 hover:text-blue-300 text-sm underline disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Resend Code
+                {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend Code"}
               </button>
             </div>
           </form>
         ) : (
           // Sign Up Form
-          <form onSubmit={handleSignUp} className="space-y-4">
+          <form 
+            onSubmit={handleSignUp} 
+            className={`space-y-4 transition-all duration-500 ease-in-out ${
+              isAnimating
+                ? "translate-x-full opacity-0 scale-95"
+                : shouldAnimateIn
+                ? "translate-x-full opacity-0 scale-95"
+                : isAnimatingToVerification
+                ? "translate-x-full opacity-0 scale-95"
+                : "translate-x-0 opacity-100 scale-100"
+            }`}
+          >
           {/* First Name and Last Name in one row */}
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -273,7 +369,15 @@ export default function SignUp() {
         )}
 
         {!pendingVerification && (
-          <div className="text-center">
+          <div className={`text-center transition-all duration-500 ease-in-out ${
+            isAnimating
+              ? "translate-x-full opacity-0 scale-95"
+              : shouldAnimateIn
+              ? "translate-x-full opacity-0 scale-95"
+              : isAnimatingToVerification
+              ? "translate-x-full opacity-0 scale-95"
+              : "translate-x-0 opacity-100 scale-100"
+          }`}>
             <p className="text-gray-300 text-sm">
               Already have an account?{" "}
               <button

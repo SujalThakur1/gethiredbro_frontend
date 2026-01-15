@@ -8,9 +8,10 @@ interface ShareUIProps {
   darkSide?: "left" | "right";
   isExpanding?: boolean;
   shouldAnimateIn?: boolean;
+  backgroundImage?: string;
 }
 
-export default function ShareUI({ children, darkSide = "left", isExpanding = false, shouldAnimateIn = false }: ShareUIProps) {
+export default function ShareUI({ children, darkSide = "left", isExpanding = false, shouldAnimateIn = false, backgroundImage = "/images/images.jpg" }: ShareUIProps) {
   const halfClipPath = darkSide === "left" 
     ? 'polygon(0 0, 50% 0, 50% 100%, 0 100%)'
     : 'polygon(50% 0, 100% 0, 100% 100%, 50% 100%)';
@@ -55,7 +56,7 @@ export default function ShareUI({ children, darkSide = "left", isExpanding = fal
       <div className="relative w-full max-w-5xl h-[600px] rounded-2xl shadow-2xl overflow-hidden">
         <div className="absolute inset-0">
           <Image
-            src="/images/images.jpg"
+            src={backgroundImage}
             alt="Popup Background"
             fill
             className="object-cover"
