@@ -116,17 +116,16 @@ export default function SignUp() {
       // Start animation: animate sign-up form out to the right
       setIsAnimatingToVerification(true);
       
-      // After animation completes, change to verification form and animate content in
+      // Safari fix: Set verification state immediately to prevent button freeze
+      // This removes the nested setTimeout pattern that Safari blocks
+      setPendingVerification(true);
+      setSuccess("Verification code sent to your email!");
+      setResendCooldown(30); // 30 second cooldown before allowing resend
+      
+      // Reset animation state after content animates in (non-blocking, single setTimeout)
       setTimeout(() => {
-        setPendingVerification(true);
-        setSuccess("Verification code sent to your email!");
-        setResendCooldown(30); // 30 second cooldown before allowing resend
-        
-        // Reset animation state after content animates in
-        setTimeout(() => {
-          setIsAnimatingToVerification(false);
-        }, 500);
-      }, 500); // Wait for sign-up form to animate out
+        setIsAnimatingToVerification(false);
+      }, 1000); // Combined timing for both animations
     } catch (err) {
       if (isClerkAPIResponseError(err)) {
         const firstError = err.errors[0];
