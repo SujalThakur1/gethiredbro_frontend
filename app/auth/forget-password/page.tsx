@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useSignIn } from "@clerk/nextjs";
+import { isClerkAPIResponseError } from "@clerk/nextjs/errors";
+import { ClerkAPIError } from "@clerk/types";
 import ShareUI from "@/components/auth/shareui";
 
 export default function ForgotPassword() {
@@ -93,13 +95,20 @@ export default function ForgotPassword() {
           setIsAnimatingToStep2(false);
         }, 500);
       }, 500); // Wait for step 1 content to animate out
-    } catch (err: any) {
-      const clerkError = err.errors?.[0] || err;
-      const longMessage = clerkError.longMessage || "";
-      const shortMessage = clerkError.shortMessage || "";
-      
-      const errorMessage = longMessage || shortMessage || "Failed to send verification code";
-      setError(errorMessage);
+    } catch (err) {
+      if (isClerkAPIResponseError(err)) {
+        const firstError = err.errors[0];
+        // Handle special error cases
+        if (firstError?.code === "user_locked") {
+          const lockoutTime = firstError.meta?.lockout_expires_in_seconds || 1800;
+          setError(`Account locked. You will be able to try again in ${Math.ceil(lockoutTime / 60)} minutes.`);
+        } else {
+          setError(firstError?.longMessage || firstError?.message || "Failed to send verification code");
+        }
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+        console.error("Non-Clerk error:", err);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -178,13 +187,14 @@ export default function ForgotPassword() {
           window.location.href = "/home";
         }, 1000);
       }
-    } catch (err: any) {
-      const clerkError = err.errors?.[0] || err;
-      const longMessage = clerkError.longMessage || "";
-      const shortMessage = clerkError.shortMessage || "";
-      
-      const errorMessage = longMessage || shortMessage || "Failed to reset password";
-      setError(errorMessage);
+    } catch (err) {
+      if (isClerkAPIResponseError(err)) {
+        const firstError = err.errors[0];
+        setError(firstError?.longMessage || firstError?.message || "Failed to reset password");
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+        console.error("Non-Clerk error:", err);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -383,18 +393,29 @@ export default function ForgotPassword() {
                     
                     setSuccess("New verification code sent!");
                     setResendCooldown(30);
-                  } catch (err: any) {
-                    if (err.status === 429 || err.errors?.[0]?.code === "rate_limit_exceeded") {
-                      const retryAfter = err.headers?.['retry-after'] || err.retryAfter || 10;
-                      const waitTime = parseInt(retryAfter.toString());
-                      setError(`Too many requests. Please wait ${waitTime} seconds before trying again.`);
-                      setResendCooldown(waitTime);
+                  } catch (err) {
+                    if (isClerkAPIResponseError(err)) {
+                      const firstError = err.errors[0];
+                      // Check for rate limit error
+                      if (firstError?.code === "rate_limit_exceeded") {
+                        const retryAfter = firstError.meta?.retry_after_seconds || 10;
+                        const waitTime = parseInt(retryAfter.toString());
+                        setError(`Too many requests. Please wait ${waitTime} seconds before trying again.`);
+                        setResendCooldown(waitTime);
+                      } else {
+                        setError(firstError?.longMessage || firstError?.message || "Failed to resend code");
+                      }
                     } else {
-                      const clerkError = err.errors?.[0] || err;
-                      const longMessage = clerkError.longMessage || "";
-                      const shortMessage = clerkError.shortMessage || "";
-                      const errorMessage = longMessage || shortMessage || "Failed to resend code";
-                      setError(errorMessage);
+                      // Check for HTTP 429 status
+                      if ((err as any)?.status === 429) {
+                        const retryAfter = (err as any)?.headers?.['retry-after'] || (err as any)?.retryAfter || 10;
+                        const waitTime = parseInt(retryAfter.toString());
+                        setError(`Too many requests. Please wait ${waitTime} seconds before trying again.`);
+                        setResendCooldown(waitTime);
+                      } else {
+                        setError("An unexpected error occurred. Please try again.");
+                        console.error("Non-Clerk error:", err);
+                      }
                     }
                   } finally {
                     setIsLoading(false);
