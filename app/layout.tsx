@@ -122,13 +122,6 @@ export const metadata: Metadata = {
   
   // Mobile browser theming
   themeColor: '#000000', // Change to your brand color
-  
-  // Viewport (Next.js handles this, but being explicit)
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 5,
-  },
 
   // Canonical URL
   alternates: {
@@ -143,7 +136,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <ClerkProvider dynamic>
       <html lang="en">
         <head>
           <meta name="google-site-verification" content="imRCSgLPYAfjFfqcRAr536-QZlnidmMvZ5DwUZY9Uh0" />
