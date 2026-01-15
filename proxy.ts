@@ -14,12 +14,12 @@ export default clerkMiddleware(async (auth, req) => {
   // Add CSP headers to allow Cloudflare Turnstile
   const response = NextResponse.next()
   
-  // Content Security Policy to allow Turnstile
+  // Content Security Policy to allow Turnstile and Clerk custom domain
   const cspHeader = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://*.clerk.accounts.dev https://*.clerk.dev",
-    "frame-src 'self' https://challenges.cloudflare.com https://*.clerk.accounts.dev https://*.clerk.dev",
-    "connect-src 'self' https://*.clerk.accounts.dev https://*.clerk.dev https://challenges.cloudflare.com",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://*.clerk.accounts.dev https://*.clerk.dev https://clerk.gethiredbro.com",
+    "frame-src 'self' https://challenges.cloudflare.com https://*.clerk.accounts.dev https://*.clerk.dev https://clerk.gethiredbro.com",
+    "connect-src 'self' https://*.clerk.accounts.dev https://*.clerk.dev https://challenges.cloudflare.com https://clerk.gethiredbro.com",
     "img-src 'self' data: https: blob:",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com data:",
