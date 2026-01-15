@@ -1,5 +1,4 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
-import { NextResponse } from 'next/server'
 
 const isPublicRoute = createRouteMatcher([
   '/',
@@ -10,34 +9,26 @@ const isPublicRoute = createRouteMatcher([
   '/home',
 ])
 
-export default clerkMiddleware(async (auth, req) => {
-  // Add CSP headers to allow Cloudflare Turnstile
-  const response = NextResponse.next()
-  
-  // Content Security Policy to allow Turnstile and Clerk custom domain
-  const cspHeader = [
-    "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://*.clerk.accounts.dev https://*.clerk.dev https://clerk.gethiredbro.com",
-    "frame-src 'self' https://challenges.cloudflare.com https://*.clerk.accounts.dev https://*.clerk.dev https://clerk.gethiredbro.com",
-    "connect-src 'self' https://*.clerk.accounts.dev https://*.clerk.dev https://challenges.cloudflare.com https://clerk.gethiredbro.com",
-    "img-src 'self' data: https: blob:",
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-    "font-src 'self' https://fonts.gstatic.com data:",
-    "frame-ancestors 'self'",
-  ].join('; ')
-  
-  response.headers.set('Content-Security-Policy', cspHeader)
-  
-  // Allow Turnstile to work with cross-origin
-  response.headers.set('Cross-Origin-Embedder-Policy', 'unsafe-none')
-  response.headers.set('Cross-Origin-Opener-Policy', 'same-origin-allow-popups')
-  
-  if (!isPublicRoute(req)) {
-    await auth.protect()
-  }
-  
-  return response
-})
+export default clerkMiddleware(
+  async (auth, req) => {
+    if (!isPublicRoute(req)) {
+      await auth.protect()
+    }
+  },
+  {
+    // Use Clerk's automatic CSP configuration
+    // Automatically includes all necessary directives for Clerk and Turnstile
+    // See: https://clerk.com/docs/guides/secure/best-practices/csp-headers
+    contentSecurityPolicy: {
+      // Add custom domain to directives (Clerk auto-detects FAPI URL, but custom domain needs explicit addition)
+      directives: {
+        'script-src': ['https://clerk.gethiredbro.com'],
+        'connect-src': ['https://clerk.gethiredbro.com'],
+        'frame-src': ['https://clerk.gethiredbro.com'],
+      },
+    },
+  },
+)
 
 export const config = {
   matcher: [

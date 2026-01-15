@@ -146,8 +146,6 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <head>
-          {/* Content Security Policy for Cloudflare Turnstile and Clerk custom domain */}
-          <meta httpEquiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://*.clerk.accounts.dev https://*.clerk.dev https://clerk.gethiredbro.com; frame-src 'self' https://challenges.cloudflare.com https://*.clerk.accounts.dev https://*.clerk.dev https://clerk.gethiredbro.com; connect-src 'self' https://*.clerk.accounts.dev https://*.clerk.dev https://challenges.cloudflare.com https://clerk.gethiredbro.com; img-src 'self' data: https: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:;" />
           <meta name="google-site-verification" content="imRCSgLPYAfjFfqcRAr536-QZlnidmMvZ5DwUZY9Uh0" />
           <meta name="msvalidate.01" content="43BB4B1D9B7F4EB7345434F4D1D2D757" />
           <meta name="yandex-verification" content="08c1b60c0ca7a67c" />
