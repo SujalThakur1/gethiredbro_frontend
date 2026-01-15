@@ -97,6 +97,19 @@ export default function SignUp() {
     
     if (!isLoaded) return;
 
+    // Safari fix: Manual validation since we're using noValidate
+    if (!firstName.trim() || !lastName.trim() || !email.trim() || !password.trim()) {
+      setError("All fields are required");
+      return;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
     setSuccess(null);
@@ -331,7 +344,8 @@ export default function SignUp() {
         ) : (
           // Sign Up Form
           <form 
-            onSubmit={handleSignUp} 
+            onSubmit={handleSignUp}
+            noValidate
             className={`space-y-4 transition-all duration-500 ease-in-out ${
               isAnimating
                 ? "translate-x-full opacity-0 scale-95"
@@ -351,9 +365,11 @@ export default function SignUp() {
               <input
                 type="text"
                 id="firstName"
+                name="firstName"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 required
+                autoComplete="given-name"
                 className="w-full px-4 py-3 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="First name"
               />
@@ -365,9 +381,11 @@ export default function SignUp() {
               <input
                 type="text"
                 id="lastName"
+                name="lastName"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 required
+                autoComplete="family-name"
                 className="w-full px-4 py-3 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Last name"
               />
@@ -381,9 +399,11 @@ export default function SignUp() {
             <input
               type="email"
               id="email"
+              name="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              autoComplete="email"
               className="w-full px-4 py-3 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="Enter your email"
             />
@@ -396,9 +416,11 @@ export default function SignUp() {
             <input
               type="password"
               id="password"
+              name="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              autoComplete="new-password"
               className="w-full px-4 py-3 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-lg text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="Create a password"
             />
