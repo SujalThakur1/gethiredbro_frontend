@@ -18,7 +18,7 @@ export default function SSOCallback() {
   return (
      <>
       {/* Clerk CAPTCHA element for bot protection */}
-      <div id="clerk-captcha" className="hidden"></div>
+      <div id="clerk-captcha"></div>
     <AuthenticateWithRedirectCallback
         signInUrl="/auth/sign-in?fromSSO=true"
         signUpUrl="/auth/sign-in?fromSSO=true"

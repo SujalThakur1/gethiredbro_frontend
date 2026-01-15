@@ -6,6 +6,7 @@ import { useSignIn } from "@clerk/nextjs";
 import { isClerkAPIResponseError } from "@clerk/nextjs/errors";
 import { ClerkAPIError } from "@clerk/types";
 import ShareUI from "@/components/auth/shareui";
+import { isSafari, removeCaptchaForSafari } from "@/lib/safari-captcha-handler";
 
 export default function SignIn() {
   const router = useRouter();
@@ -49,6 +50,9 @@ export default function SignIn() {
           localStorage.removeItem("rememberMeEmail");
         }
       }
+      
+      // Remove CAPTCHA for Safari users
+      removeCaptchaForSafari();
     }
   }, []);
 
@@ -272,8 +276,8 @@ export default function SignIn() {
 
   return (
     <ShareUI isExpanding={isAnimating} shouldAnimateIn={shouldAnimateIn}>
-      {/* Clerk CAPTCHA element for bot protection */}
-      <div id="clerk-captcha" className="hidden"></div>
+      {/* Clerk CAPTCHA element for bot protection - Hidden for Safari */}
+      {!isSafari() && <div id="clerk-captcha"></div>}
       
       <div className={`w-full max-w-md space-y-6 transition-all duration-500 ease-in-out ${
         isAnimating

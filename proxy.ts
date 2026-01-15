@@ -25,6 +25,7 @@ export default clerkMiddleware(
       directives: {
         'script-src': ['https://clerk.gethiredbro.com'],
         'connect-src': ['https://clerk.gethiredbro.com'],
+        'frame-src': ['https://challenges.cloudflare.com'],
       },
     },
   },

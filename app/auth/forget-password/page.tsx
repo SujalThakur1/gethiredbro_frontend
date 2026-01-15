@@ -6,6 +6,7 @@ import { useSignIn } from "@clerk/nextjs";
 import { isClerkAPIResponseError } from "@clerk/nextjs/errors";
 import { ClerkAPIError } from "@clerk/types";
 import ShareUI from "@/components/auth/shareui";
+import { isSafari, removeCaptchaForSafari } from "@/lib/safari-captcha-handler";
 
 export default function ForgotPassword() {
   const router = useRouter();
@@ -44,6 +45,9 @@ export default function ForgotPassword() {
         setShouldAnimateIn(false);
       }, 50);
     }
+    
+    // Remove CAPTCHA for Safari users
+    removeCaptchaForSafari();
   }, [shouldAnimateIn]);
 
   // Countdown timer for resend cooldown

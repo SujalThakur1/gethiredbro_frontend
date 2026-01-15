@@ -6,6 +6,7 @@ import { useSignUp } from "@clerk/nextjs";
 import { isClerkAPIResponseError } from "@clerk/nextjs/errors";
 import { ClerkAPIError } from "@clerk/types";
 import ShareUI from "@/components/auth/shareui";
+import { isSafari, removeCaptchaForSafari } from "@/lib/safari-captcha-handler";
 
 export default function SignUp() {
   const router = useRouter();
@@ -41,6 +42,9 @@ export default function SignUp() {
         setShouldAnimateIn(false);
       }, 50);
     }
+    
+    // Remove CAPTCHA for Safari users
+    removeCaptchaForSafari();
   }, [shouldAnimateIn]);
 
   // Countdown timer for resend cooldown
@@ -192,8 +196,8 @@ export default function SignUp() {
 
   return (
     <ShareUI darkSide="right" isExpanding={isAnimating} shouldAnimateIn={shouldAnimateIn}>
-      {/* Clerk CAPTCHA element for bot protection */}
-      <div id="clerk-captcha" className="hidden"></div>
+      {/* Clerk CAPTCHA element for bot protection - Hidden for Safari */}
+      {!isSafari() && <div id="clerk-captcha"></div>}
       
       <div className={`w-full max-w-md space-y-6 transition-all duration-500 ease-in-out ${
         isAnimating
