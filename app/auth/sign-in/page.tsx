@@ -75,6 +75,28 @@ export default function SignIn() {
     }
   }, [resendCooldown]);
 
+  // Check if we came from SSO callback (redirected here instead of home)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const searchParams = new URLSearchParams(window.location.search);
+      const fromSSO = searchParams.get("fromSSO");
+      const fromSSOCallback = sessionStorage.getItem("fromSSOCallback");
+      
+      // Only show error if both the query parameter AND sessionStorage flag are present
+      // This prevents showing error for manual URL navigation
+      if (fromSSO === "true" && fromSSOCallback === "true") {
+        setError("Something went wrong during authentication. Please try again.");
+        
+        // Clear the sessionStorage flag
+        sessionStorage.removeItem("fromSSOCallback");
+        
+        // Clean up URL parameter
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, "", newUrl);
+      }
+    }
+  }, []);
+
   const handleSignUpClick = () => {
     setIsAnimating(true);
     // Set flag before navigation
