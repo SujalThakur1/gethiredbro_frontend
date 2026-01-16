@@ -52,7 +52,7 @@ export default function SignIn() {
       }
       
       // Remove CAPTCHA for Safari users
-      removeCaptchaForSafari();
+      // removeCaptchaForSafari();
     }
   }, []);
 

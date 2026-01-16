@@ -47,7 +47,7 @@ export default function ForgotPassword() {
     }
     
     // Remove CAPTCHA for Safari users
-    removeCaptchaForSafari();
+    // removeCaptchaForSafari();
   }, [shouldAnimateIn]);
 
   // Countdown timer for resend cooldown
