@@ -196,10 +196,6 @@ export default function SignUp() {
 
   return (
     <ShareUI darkSide="right" isExpanding={isAnimating} shouldAnimateIn={shouldAnimateIn}>
-      {/* Clerk CAPTCHA element for bot protection - Hidden for Safari */}
-      {/* {!isSafari() && <div id="clerk-captcha" className="hidden"></div>} */}
-       <div id="clerk-captcha" className="hidden"></div>
-      
       <div className={`w-full max-w-md space-y-6 transition-all duration-500 ease-in-out ${
         isAnimating
           ? "translate-x-full opacity-0 scale-95"
@@ -430,6 +426,9 @@ export default function SignUp() {
               placeholder="Create a password"
             />
           </div>
+
+          {/* Clerk CAPTCHA widget - must be inside the form */}
+          <div id="clerk-captcha" />
 
             <button
               type="submit"
