@@ -21,10 +21,12 @@ export default clerkMiddleware(
     // See: https://clerk.com/docs/guides/secure/best-practices/csp-headers
     contentSecurityPolicy: {
       strict: true,
-      // Add custom domain to directives (Clerk auto-detects FAPI URL, but custom domain needs explicit addition)
       directives: {
         'script-src': ['https://clerk.gethiredbro.com'],
-        'connect-src': ['https://clerk.gethiredbro.com'],
+        'connect-src': [
+          'https://clerk.gethiredbro.com',
+          'https://formspree.io', // Add Formspree for form submissions
+        ],
         'frame-src': ['https://challenges.cloudflare.com'],
       },
     },
