@@ -6,7 +6,6 @@ import { useSignUp } from "@clerk/nextjs";
 import { isClerkAPIResponseError } from "@clerk/nextjs/errors";
 import { ClerkAPIError } from "@clerk/types";
 import ShareUI from "@/components/auth/shareui";
-import { isSafari, removeCaptchaForSafari } from "@/lib/safari-captcha-handler";
 
 export default function SignUp() {
   const router = useRouter();
@@ -428,7 +427,7 @@ export default function SignUp() {
           </div>
 
           {/* Clerk CAPTCHA widget - must be inside the form */}
-          <div id="clerk-captcha" className="hidden"></div>
+          <div id="clerk-captcha"/>
 
             <button
               type="submit"
