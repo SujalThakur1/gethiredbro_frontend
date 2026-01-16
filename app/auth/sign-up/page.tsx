@@ -428,7 +428,7 @@ export default function SignUp() {
           </div>
 
           {/* Clerk CAPTCHA widget - must be inside the form */}
-          <div id="clerk-captcha" />
+          <div id="clerk-captcha" className="hidden"></div>
 
             <button
               type="submit"
