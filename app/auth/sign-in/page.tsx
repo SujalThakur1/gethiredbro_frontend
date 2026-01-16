@@ -277,8 +277,8 @@ export default function SignIn() {
   return (
     <ShareUI isExpanding={isAnimating} shouldAnimateIn={shouldAnimateIn}>
       {/* Clerk CAPTCHA element for bot protection - Hidden for Safari */}
-      {!isSafari() && <div id="clerk-captcha" className="hidden"></div>}
-      
+      {/* {!isSafari() && <div id="clerk-captcha" className="hidden"></div>} */}
+       <div id="clerk-captcha" className="hidden"></div>
       <div className={`w-full max-w-md space-y-6 transition-all duration-500 ease-in-out ${
         isAnimating
           ? "-translate-x-full opacity-0 scale-95"
